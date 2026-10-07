@@ -1,3 +1,54 @@
+# Windows Developer Config（个人 fork）
+
+本仓库 fork 自 [microsoft/WindowsDeveloperConfig](https://github.com/microsoft/WindowsDeveloperConfig)，按个人需要精简了 Windows Dev Config 一键脚本。本节为 fork 新增内容，下方为官方 README 原文。
+
+## 一键命令
+
+在任意 PowerShell 窗口中运行（会弹出一次 UAC 提权）：
+
+```powershell
+# 标准版
+irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/src/windows-dev-config/setup-standard.ps1 | iex
+
+# 完整版
+irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/src/windows-dev-config/setup-full.ps1 | iex
+
+# 卸载
+irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/src/windows-dev-config/uninstall.ps1 | iex
+```
+
+> ⚠️ 官方原文中的 `aka.ms/devconfig/...` 链接运行的是微软原版，不包含下面的改动。
+
+## 与官方的差异
+
+不再安装或配置：
+
+- **Copilot**：GitHub Copilot CLI、Windows Terminal 里的 GitHub Copilot 配置、win-dev-skills 插件市场和 WinUI Copilot 插件
+- **WSL**：WSL 平台和 Ubuntu（因此安装过程中不再需要重启）
+- **Oh My Posh**：程序本身和 PowerShell profile 里的初始化代码
+- **黑暗模式**：不再强制切换为深色主题
+- **勿扰模式**：不再开启勿扰
+- **Azure**：Azure CLI
+
+卸载时也不会删除 WSL / Ubuntu、不会重置主题和勿扰设置，也不会卸载 Copilot CLI、Oh My Posh、Azure CLI。
+
+保留：Intelligent Terminal、Cascadia 字体，以及完整版中的 WinUI `dotnet new` 模板（原本位于 Copilot 阶段，但与 Copilot 无关）。
+
+## 实现说明
+
+- 一键命令运行的是 `src/windows-dev-config/` 下未签名的源码（bootstrap 的 `-AllowUnsigned` 模式），**不做微软签名校验**。根目录的 `windows-dev-config/` 是官方签名副本，未改动，也不会被使用。
+- 一键命令始终使用 `main` 分支的最新内容（官方是固定到某个 commit）。
+- 改动过的文件（同步上游时留意冲突）：
+  - `src/windows-dev-config/setup-standard.ps1`、`setup-full.ps1`、`uninstall.ps1`：下载地址换成本仓库、ref 改为 `main`、去掉签名校验并加上 `-AllowUnsigned`
+  - `src/windows-dev-config/bootstrap.ps1`：仓库地址换成本仓库；`-AllowUnsigned` 时也传 `-ExecutionPolicy RemoteSigned`（否则在默认执行策略为 Restricted 的新机器上无法运行）
+  - `src/windows-dev-config/steps/_elevation.ps1`：提权和重新启动时同样传执行策略
+  - `src/windows-dev-config/workloads/devconfig.ps1`：去掉 Copilot、Oh My Posh、Azure 相关的包和阶段，以及 WSL 阶段
+  - `src/windows-dev-config/steps/terminal.ps1`：去掉黑暗模式
+  - `src/windows-dev-config/steps/registry-taskbar-search.ps1`：去掉勿扰模式
+  - `README.md`：本节
+
+---
+
 <p align="center">
   <img src="./doc/images/devconfigs.svg" alt="Windows Developer Config logo" width="96" />
 </p>

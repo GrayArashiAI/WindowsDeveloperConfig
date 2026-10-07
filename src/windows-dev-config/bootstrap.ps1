@@ -122,7 +122,7 @@ function Invoke-CalmOsBootstrap {
         }
     }
 
-    $repo = 'microsoft/WindowsDeveloperConfig'
+    $repo = 'GrayArashiAI/WindowsDeveloperConfig'
     $microsoftSignerSubject = 'CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US'
     $Workload = $Workload.ToLowerInvariant()
     # The default workload is omitted from command lines so refs that predate workloads still accept them.
@@ -156,7 +156,7 @@ function Invoke-CalmOsBootstrap {
     if ($Action -ne 'Uninstall' -and (Test-Path -LiteralPath $pwsh)) { $shell = $pwsh }
     $escapedShell = [Management.Automation.Language.CodeGeneration]::EscapeSingleQuotedStringContent($shell)
     $arguments = @('-NoProfile')
-    if (-not $AllowUnsigned) { $arguments += '-ExecutionPolicy', 'RemoteSigned' }
+    $arguments += '-ExecutionPolicy', 'RemoteSigned'
 
     function Get-CalmOsElevationCommand {
         param(
@@ -184,7 +184,7 @@ function Invoke-CalmOsBootstrap {
             $env:PSModulePath = "$PSHOME\Modules;$env:PSModulePath"
             [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
             $flow = if ($AllowUnsigned) { 'src/windows-dev-config' } else { 'windows-dev-config' }
-            $baseUri = "https://raw.githubusercontent.com/microsoft/WindowsDeveloperConfig/$Ref/$flow"
+            $baseUri = "https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/$Ref/$flow"
             $securityCode = (Invoke-DevConfigWebRequest -Parameters @{
                 Uri = "$baseUri/steps/_security.ps1"; TimeoutSec = 60
             }).Content.TrimStart([char]0xFEFF)
@@ -223,7 +223,7 @@ function Invoke-CalmOsBootstrap {
 
             $shellName = if ($PSVersionTable.PSEdition -eq 'Core') { 'pwsh.exe' } else { 'powershell.exe' }
             $arguments = @('-NoProfile')
-            if (-not $AllowUnsigned) { $arguments += '-ExecutionPolicy', 'RemoteSigned' }
+            $arguments += '-ExecutionPolicy', 'RemoteSigned'
             $arguments += '-File', $target, '-Ref', $Ref, '-InstallRoot', $InstallRoot, '-Action', $Action
             if ($Workload -ne 'devconfig') { $arguments += '-Workload', $Workload }
             if ($AllowUnsigned) { $arguments += '-AllowUnsigned' }

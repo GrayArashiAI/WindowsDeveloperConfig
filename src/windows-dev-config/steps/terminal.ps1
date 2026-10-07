@@ -70,14 +70,12 @@ function Set-DevConfigPs7DefaultProfile {
 
 function Invoke-TerminalPhase {
     if ($Script:DevConfigAction -eq 'Uninstall') {
+        # wsl.ps1 is not a phase here, so its distribution name variable is never set.
         $steps = @(
-            foreach ($setting in $Script:DevConfigThemeSettings) {
-                New-DevConfigRegistryStep -Setting $setting -Reset
-            }
             New-DevConfigStep -Name 'TerminalReset' -Description 'Remove Terminal defaults and PowerShell, Copilot, and Ubuntu profiles' -BestEffort `
                 -Check { param($DistributionName) Reset-DevConfigTerminal -DistributionName $DistributionName -CheckOnly } `
                 -Apply { param($DistributionName) Reset-DevConfigTerminal -DistributionName $DistributionName } `
-                -ArgumentList @($Script:DevConfigWslDistributionName)
+                -ArgumentList @('Ubuntu')
         )
         Invoke-DevConfigSteps -Steps $steps
         return
@@ -85,9 +83,6 @@ function Invoke-TerminalPhase {
 
     # These user preferences are best-effort so later setup phases can continue.
     $steps = @(
-        New-DevConfigStep -Name 'DarkTheme' -Description 'Force dark app/system theme' -BestEffort `
-            -Check { Test-DevConfigDarkThemeSet } `
-            -Apply { Set-DevConfigDarkTheme }
         New-DevConfigStep -Name 'Ps7DefaultProfile' -Description 'Set PowerShell 7 as the default Windows Terminal profile' -BestEffort `
             -Check { Test-DevConfigPs7DefaultProfile } `
             -Apply { Set-DevConfigPs7DefaultProfile }

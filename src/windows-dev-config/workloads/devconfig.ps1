@@ -16,7 +16,6 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-# WSL stays last so its required reboot happens after other phases.
 $phases = @(
     @{
         File     = 'prerequisites.ps1'
@@ -36,8 +35,6 @@ $phases = @(
                 'PowerShell'
                 'Git'
                 'GitHubCLI'
-                'AzureCLI'
-                'GitHubCopilot'
                 'VSCode'
                 'DotnetSdk'
                 'Python'
@@ -46,7 +43,6 @@ $phases = @(
                 'NodeJS'
                 'nvmForNode'
                 'Coreutils'
-                'OhMyPosh'
                 'winappCli'
                 'PowerToys'
             )
@@ -88,26 +84,17 @@ $phases = @(
         Uninstall = $true
     }
     @{
-        File      = 'powershell-profile.ps1'
-        Function  = 'Invoke-PowerShellProfilePhase'
-        Title     = 'PowerShell profile'
-        Uninstall = $true
-    }
-    @{
+        # Only the WinUI templates step; the Copilot profile and plugin steps are skipped.
         File      = 'copilot.ps1'
         Function  = 'Invoke-CopilotPhase'
-        Title     = 'GitHub Copilot'
+        Title     = 'WinUI templates'
         Uninstall = $true
-    }
-    @{
-        File      = 'wsl.ps1'
-        Function  = 'Invoke-WslPhase'
-        Title     = 'WSL + Ubuntu'
-        Uninstall = $true
+        Steps     = if ($Action -eq 'Uninstall') { @('WinUITemplatesCleanup') } else { @('WinUITemplates') }
     }
 )
 if ($Action -eq 'Partial') {
-    $phases = @($phases | Where-Object { $_.File -ne 'edge.ps1' })
+    # Partial setup has no WinUI templates step, so the copilot.ps1 phase has nothing left to run.
+    $phases = @($phases | Where-Object { $_.File -notin @('edge.ps1', 'copilot.ps1') })
     ($phases | Where-Object { $_.File -eq 'registry-taskbar-search.ps1' }).Title = 'Taskbar & Start tweaks'
 } elseif ($Action -eq 'Uninstall') {
     $phases = @($phases | Where-Object { $_['Uninstall'] })
@@ -120,8 +107,7 @@ if ($Action -eq 'Partial') {
 @{
     Name             = 'Calm OS'
     Actions          = @('Full', 'Partial', 'Uninstall')
-    SetupNote        = 'one reboot expected along the way'
-    UninstallWarning = 'Ubuntu and its files will be deleted. Targeted tools are removed even if they predate setup.'
+    UninstallWarning = 'Targeted tools are removed even if they predate setup.'
     Notes            = @('A few Explorer and taskbar changes appear once you sign out and back in.')
     Phases           = $phases
 }

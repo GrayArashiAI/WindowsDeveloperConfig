@@ -157,9 +157,7 @@ function Get-DevConfigRelaunchArguments {
         [ValidatePattern('^[a-z0-9]+(-[a-z0-9]+)*$')] [string] $Workload = 'devconfig'
     )
     $arguments = @('-NoProfile')
-    if (-not $AllowUnsigned) {
-        $arguments += '-ExecutionPolicy', 'RemoteSigned'
-    }
+    $arguments += '-ExecutionPolicy', 'RemoteSigned'
     $arguments += '-File', "`"$ScriptPath`""
     if ($ApplyTerminalFont) {
         $arguments += '-ApplyTerminalFont'

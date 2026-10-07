@@ -11,13 +11,6 @@ function Invoke-RegistryTaskbarSearchPhase {
 
     $tweaks = @(
         @{
-            Name        = 'DoNotDisturb'
-            KeyPath     = 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings'
-            ValueName   = 'NOC_GLOBAL_SETTING_TOASTS_ENABLED'
-            Value       = 0
-            Description = 'Enable Do Not Disturb (disable all notifications)'
-        }
-        @{
             Name        = 'BluetoothOff'
             KeyPath     = 'HKCU\Control Panel\Bluetooth'
             ValueName   = 'Notification Area Icon'
@@ -77,15 +70,6 @@ function Invoke-RegistryTaskbarSearchPhase {
 
     $steps = foreach ($tweak in $tweaks) {
         New-DevConfigRegistryStep -Setting $tweak -Reset:($Script:DevConfigAction -eq 'Uninstall')
-    }
-    if ($Script:DevConfigAction -eq 'Uninstall') {
-        $steps += New-DevConfigRegistryStep -Reset -Setting @{
-            Name       = 'QuietHoursProfile'
-            KeyPath    = 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\QuietHours\Profiles'
-            ValueName  = 'DefaultProfile'
-            Type       = 'String'
-            ResetValue = 'Microsoft.QuietHoursProfile.Unrestricted'
-        }
     }
 
     Invoke-DevConfigSteps -Steps $steps
