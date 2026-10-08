@@ -27,7 +27,7 @@ irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/s
 运行前请注意：
 
 - 可以重复运行，已经完成的步骤会自动跳过；中途出错的话，再运行一次即可。
-- 部分资源管理器、任务栏设置和终端字体，要注销后重新登录才会生效。
+- 部分资源管理器和任务栏设置，要注销后重新登录才会生效。
 - 安装文件和日志保存在 `%ProgramData%\CalmOS`。
 - 卸载会删除下表中的所有软件（Windows Terminal 和 VC++ 运行库除外），**安装前就已存在的也会被删除**；设置会恢复为 Windows 默认值，而不是安装前的值。
 - 官方 README 里的 `aka.ms/devconfig/...` 链接运行的是微软原版，不包含本仓库的改动。
@@ -41,7 +41,7 @@ irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/s
 | 资源管理器 | 显示文件扩展名和隐藏文件、标题栏显示完整路径、默认打开"此电脑"、快速访问不显示最近使用的文件 / 常用文件夹 / 推荐文件、不显示同步提供程序（如 OneDrive）的提示、显示详细信息窗格 | — |
 | 任务栏、开始菜单、搜索 | 任务栏右键"结束任务"、隐藏蓝牙图标、关闭开始菜单推荐和账户通知、关闭网页搜索和搜索亮点、关闭小组件 | — |
 | Edge | 跳过首次运行向导 | — |
-| 终端 | 安装 Cascadia Nerd Font 并设为默认字体、默认配置设为 PowerShell 7 | — |
+| 终端 | 默认配置设为 PowerShell 7 | — |
 
 ## 与官方原版的区别
 
@@ -50,6 +50,7 @@ irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/s
 - **Copilot**：GitHub Copilot CLI、Windows Terminal 里的 Copilot 配置、win-dev-skills 插件市场和 WinUI Copilot 插件
 - **WSL**：WSL 平台和 Ubuntu，安装过程因此不再需要重启
 - **Oh My Posh**：程序本身和 PowerShell profile 里的初始化代码（包括其中的 UTF-8 控制台编码设置）
+- **Cascadia Nerd Font**：终端默认字体本来就是 Cascadia Mono，NF 版只多了图标字形，不装 Oh My Posh 用不上
 - **Azure CLI**
 - **强制深色主题**
 - **勿扰模式**
@@ -87,7 +88,7 @@ git merge upstream/main
 | `setup-standard.ps1`、`setup-full.ps1`、`uninstall.ps1` | 下载地址换成本仓库、ref 改为 `main`、去掉签名校验、加上 `-AllowUnsigned` |
 | `bootstrap.ps1` | 仓库地址换成本仓库；`-AllowUnsigned` 时也传 `-ExecutionPolicy RemoteSigned`，否则在执行策略为 Restricted 的新机器上无法运行 |
 | `steps/_elevation.ps1` | 脚本重新启动自身时同样传执行策略 |
-| `workloads/devconfig.ps1` | 去掉 Copilot、Oh My Posh、Azure CLI 和 WSL；调整标准版包含的软件和阶段 |
+| `workloads/devconfig.ps1` | 去掉 Copilot、Oh My Posh、Azure CLI、WSL 和字体；调整标准版包含的软件和阶段 |
 | `steps/terminal.ps1` | 去掉强制深色主题 |
 | `steps/registry-taskbar-search.ps1` | 去掉勿扰模式；调整标准版包含的设置 |
 | `steps/edge.ps1` | 去掉新标签页策略 |

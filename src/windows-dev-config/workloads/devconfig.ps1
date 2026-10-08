@@ -73,11 +73,6 @@ $phases = @(
         Uninstall = $true
     }
     @{
-        File     = 'fonts.ps1'
-        Function = 'Invoke-FontsPhase'
-        Title    = 'Fonts'
-    }
-    @{
         File      = 'terminal.ps1'
         Function  = 'Invoke-TerminalPhase'
         Title     = 'Windows Terminal'
