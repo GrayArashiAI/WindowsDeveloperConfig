@@ -152,10 +152,6 @@ function Invoke-RegistryExplorerPhase {
         }
     )
 
-    if ($Script:DevConfigAction -eq 'Partial') {
-        $tweaks = @($tweaks | Where-Object { $_.Name -ne 'RecommendedFiles' })
-    }
-
     $steps = foreach ($tweak in $tweaks) {
         New-DevConfigRegistryStep -Setting $tweak -Reset:($Script:DevConfigAction -eq 'Uninstall')
     }

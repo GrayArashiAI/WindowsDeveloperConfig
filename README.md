@@ -1,53 +1,101 @@
 # Windows Developer Config（个人 fork）
 
-本仓库 fork 自 [microsoft/WindowsDeveloperConfig](https://github.com/microsoft/WindowsDeveloperConfig)，按个人需要精简了 Windows Dev Config 一键脚本。本节为 fork 新增内容，下方为官方 README 原文。
+本仓库 fork 自 [microsoft/WindowsDeveloperConfig](https://github.com/microsoft/WindowsDeveloperConfig)，在官方 Windows Dev Config 一键脚本的基础上去掉了不需要的内容，并重新划分了标准版和完整版。分隔线以下是官方 README 原文。
 
-## 一键命令
+## 一键安装
 
-在任意 PowerShell 窗口中运行（会弹出一次 UAC 提权）：
+打开任意 PowerShell 窗口运行下面的命令。过程中会弹出一次 UAC 提权，不需要重启。
+
+**标准版**：常用开发工具 + 系统设置
 
 ```powershell
-# 标准版
 irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/src/windows-dev-config/setup-standard.ps1 | iex
+```
 
-# 完整版
+**完整版**：标准版 + .NET SDK 10、PowerToys、WinUI 模板、远程桌面
+
+```powershell
 irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/src/windows-dev-config/setup-full.ps1 | iex
+```
 
-# 卸载
+**卸载**：删除安装的软件，并把设置恢复为 Windows 默认值
+
+```powershell
 irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/src/windows-dev-config/uninstall.ps1 | iex
 ```
 
-> ⚠️ 官方原文中的 `aka.ms/devconfig/...` 链接运行的是微软原版，不包含下面的改动。
+运行前请注意：
 
-## 与官方的差异
+- 可以重复运行，已经完成的步骤会自动跳过；中途出错的话，再运行一次即可。
+- 部分资源管理器、任务栏设置和终端字体，要注销后重新登录才会生效。
+- 安装文件和日志保存在 `%ProgramData%\CalmOS`。
+- 卸载会删除下表中的所有软件（Windows Terminal 和 VC++ 运行库除外），**安装前就已存在的也会被删除**；设置会恢复为 Windows 默认值，而不是安装前的值。
+- 官方 README 里的 `aka.ms/devconfig/...` 链接运行的是微软原版，不包含本仓库的改动。
 
-不再安装或配置：
+## 安装内容
 
-- **Copilot**：GitHub Copilot CLI、Windows Terminal 里的 GitHub Copilot 配置、win-dev-skills 插件市场和 WinUI Copilot 插件
-- **WSL**：WSL 平台和 Ubuntu（因此安装过程中不再需要重启）
+| 类别 | 标准版 | 完整版额外包含 |
+| --- | --- | --- |
+| 软件 | Windows Terminal、Intelligent Terminal、PowerShell 7、Git、GitHub CLI、VS Code、Python 3.14 + uv、VC++ 运行库、Node.js LTS + nvm、Coreutils、Windows App CLI | .NET SDK 10、PowerToys、WinUI `dotnet new` 模板 |
+| 系统 | Sudo（内联模式）、开发者模式、长路径支持 | 开启远程桌面（不开放防火墙） |
+| 资源管理器 | 显示文件扩展名和隐藏文件、标题栏显示完整路径、默认打开"此电脑"、快速访问不显示常用文件夹 / 常用文件 / 推荐文件、不显示同步提供程序（如 OneDrive）的提示、设置详细信息窗格状态 | — |
+| 任务栏、开始菜单、搜索 | 任务栏右键"结束任务"、隐藏蓝牙图标、关闭开始菜单推荐和账户通知、关闭网页搜索和搜索亮点、关闭小组件 | — |
+| Edge | 新标签页设为空白页、跳过首次运行向导 | — |
+| 终端 | 安装 Cascadia Nerd Font 并设为默认字体、默认配置设为 PowerShell 7 | — |
+
+Edge 的两项设置以组策略方式写入，所以 Edge 会显示"由你的组织管理"，这两项在 Edge 设置里也会变成灰色、无法修改。
+
+## 与官方原版的区别
+
+**两个版本都去掉了**
+
+- **Copilot**：GitHub Copilot CLI、Windows Terminal 里的 Copilot 配置、win-dev-skills 插件市场和 WinUI Copilot 插件
+- **WSL**：WSL 平台和 Ubuntu，安装过程因此不再需要重启
 - **Oh My Posh**：程序本身和 PowerShell profile 里的初始化代码
-- **黑暗模式**：不再强制切换为深色主题
-- **勿扰模式**：不再开启勿扰
-- **Azure**：Azure CLI
+- **Azure CLI**
+- **强制深色主题**
+- **勿扰模式**
 
-卸载时也不会删除 WSL / Ubuntu、不会重置主题和勿扰设置，也不会卸载 Copilot CLI、Oh My Posh、Azure CLI。
+相应地，卸载时也不再删除 WSL 和 Ubuntu、不再重置主题和勿扰设置、不再卸载上面这些软件。
 
-保留：Intelligent Terminal、Cascadia 字体，以及完整版中的 WinUI `dotnet new` 模板（原本位于 Copilot 阶段，但与 Copilot 无关）。
+**标准版和完整版的划分不同**：官方标准版也会安装 .NET SDK 10 和 PowerToys，但不包含 Sudo、开发者模式、Edge 设置，以及隐藏蓝牙图标、关闭网页搜索 / 搜索亮点 / 小组件、快速访问不显示推荐文件这几项。
 
-## 实现说明
+**运行方式**：一键命令运行的是本仓库 `main` 分支上 `src/windows-dev-config/` 里**未签名**的源码，不做微软签名校验；官方运行的是固定到某个 commit、经过微软签名的根目录副本。这意味着，能推送到本仓库 `main` 分支的人，就能控制以管理员权限运行的代码。
 
-- 一键命令运行的是 `src/windows-dev-config/` 下未签名的源码（bootstrap 的 `-AllowUnsigned` 模式），**不做微软签名校验**。根目录的 `windows-dev-config/` 是官方签名副本，未改动，也不会被使用。
-- 一键命令始终使用 `main` 分支的最新内容（官方是固定到某个 commit）。
-- 改动过的文件（同步上游时留意冲突）：
-  - `src/windows-dev-config/setup-standard.ps1`、`setup-full.ps1`、`uninstall.ps1`：下载地址换成本仓库、ref 改为 `main`、去掉签名校验并加上 `-AllowUnsigned`
-  - `src/windows-dev-config/bootstrap.ps1`：仓库地址换成本仓库；`-AllowUnsigned` 时也传 `-ExecutionPolicy RemoteSigned`（否则在默认执行策略为 Restricted 的新机器上无法运行）
-  - `src/windows-dev-config/steps/_elevation.ps1`：提权和重新启动时同样传执行策略
-  - `src/windows-dev-config/workloads/devconfig.ps1`：去掉 Copilot、Oh My Posh、Azure 相关的包和阶段，以及 WSL 阶段
-  - `src/windows-dev-config/steps/terminal.ps1`：去掉黑暗模式
-  - `src/windows-dev-config/steps/registry-taskbar-search.ps1`：去掉勿扰模式
-  - `README.md`：本节
+## 同步上游
+
+首次同步前添加上游仓库：
+
+```bash
+git remote add upstream https://github.com/microsoft/WindowsDeveloperConfig
+```
+
+之后每次同步：
+
+```bash
+git fetch upstream
+git merge upstream/main
+```
+
+- GitHub 网页上的 "Sync fork" 无法处理冲突，要用命令行合并。
+- 三个入口脚本里的 `$payloadRef` 官方每次发版都会改，merge 时必然冲突，保留本仓库的版本即可。
+- 如果上游改了 `.github/workflows/` 下的文件，推送前需要给 GitHub CLI 补上 `workflow` 权限：`gh auth refresh -h github.com -s workflow`。
+
+本仓库改过的文件如下（另外还有本 README 开头这部分），冲突只会出现在这些文件里：
+
+| 文件（位于 `src/windows-dev-config/`） | 改动 |
+| --- | --- |
+| `setup-standard.ps1`、`setup-full.ps1`、`uninstall.ps1` | 下载地址换成本仓库、ref 改为 `main`、去掉签名校验、加上 `-AllowUnsigned` |
+| `bootstrap.ps1` | 仓库地址换成本仓库；`-AllowUnsigned` 时也传 `-ExecutionPolicy RemoteSigned`，否则在执行策略为 Restricted 的新机器上无法运行 |
+| `steps/_elevation.ps1` | 提权和重新启动时同样传执行策略 |
+| `workloads/devconfig.ps1` | 去掉 Copilot、Oh My Posh、Azure CLI 和 WSL；调整标准版包含的软件和阶段 |
+| `steps/terminal.ps1` | 去掉强制深色主题 |
+| `steps/registry-taskbar-search.ps1` | 去掉勿扰模式；调整标准版包含的设置 |
+| `steps/registry-system.ps1`、`steps/registry-explorer.ps1` | 调整标准版包含的设置 |
 
 ---
+
+## 📄 以下为官方 README 原文（未按本 fork 的改动更新，内容不一定准确）
 
 <p align="center">
   <img src="./doc/images/devconfigs.svg" alt="Windows Developer Config logo" width="96" />

@@ -42,7 +42,7 @@ function Invoke-RegistrySystemPhase {
     )
 
     if ($Script:DevConfigAction -eq 'Partial') {
-        $tweaks = @($tweaks | Where-Object { $_.Name -eq 'LongPaths' })
+        $tweaks = @($tweaks | Where-Object { $_.Name -ne 'RemoteDesktop' })
     }
 
     $steps = foreach ($tweak in $tweaks) {

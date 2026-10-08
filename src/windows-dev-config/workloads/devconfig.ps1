@@ -94,8 +94,10 @@ $phases = @(
 )
 if ($Action -eq 'Partial') {
     # Partial setup has no WinUI templates step, so the copilot.ps1 phase has nothing left to run.
-    $phases = @($phases | Where-Object { $_.File -notin @('edge.ps1', 'copilot.ps1') })
-    ($phases | Where-Object { $_.File -eq 'registry-taskbar-search.ps1' }).Title = 'Taskbar & Start tweaks'
+    $phases = @($phases | Where-Object { $_.File -ne 'copilot.ps1' })
+    # The lite setup skips the two largest downloads.
+    $packages = ($phases | Where-Object { $_.File -eq 'packages.ps1' }).Parameters
+    $packages.Packages = @($packages.Packages | Where-Object { $_ -notin @('DotnetSdk', 'PowerToys') })
 } elseif ($Action -eq 'Uninstall') {
     $phases = @($phases | Where-Object { $_['Uninstall'] })
     # Reset Terminal after removing the tools and WSL fragments that can recreate profiles.
