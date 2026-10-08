@@ -38,12 +38,10 @@ irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/s
 | --- | --- | --- |
 | 软件 | Windows Terminal、Intelligent Terminal、PowerShell 7、Git、GitHub CLI、VS Code、Python 3.14 + uv、VC++ 运行库、Node.js LTS + nvm、Coreutils、Windows App CLI | .NET SDK 10、PowerToys、WinUI `dotnet new` 模板 |
 | 系统 | Sudo（内联模式）、开发者模式、长路径支持 | 开启远程桌面（不开放防火墙） |
-| 资源管理器 | 显示文件扩展名和隐藏文件、标题栏显示完整路径、默认打开"此电脑"、快速访问不显示常用文件夹 / 常用文件 / 推荐文件、不显示同步提供程序（如 OneDrive）的提示、设置详细信息窗格状态 | — |
+| 资源管理器 | 显示文件扩展名和隐藏文件、标题栏显示完整路径、默认打开"此电脑"、快速访问不显示最近使用的文件 / 常用文件夹 / 推荐文件、不显示同步提供程序（如 OneDrive）的提示、显示详细信息窗格 | — |
 | 任务栏、开始菜单、搜索 | 任务栏右键"结束任务"、隐藏蓝牙图标、关闭开始菜单推荐和账户通知、关闭网页搜索和搜索亮点、关闭小组件 | — |
-| Edge | 新标签页设为空白页、跳过首次运行向导 | — |
+| Edge | 跳过首次运行向导 | — |
 | 终端 | 安装 Cascadia Nerd Font 并设为默认字体、默认配置设为 PowerShell 7 | — |
-
-Edge 的两项设置以组策略方式写入，所以 Edge 会显示"由你的组织管理"，这两项在 Edge 设置里也会变成灰色、无法修改。
 
 ## 与官方原版的区别
 
@@ -51,12 +49,13 @@ Edge 的两项设置以组策略方式写入，所以 Edge 会显示"由你的�
 
 - **Copilot**：GitHub Copilot CLI、Windows Terminal 里的 Copilot 配置、win-dev-skills 插件市场和 WinUI Copilot 插件
 - **WSL**：WSL 平台和 Ubuntu，安装过程因此不再需要重启
-- **Oh My Posh**：程序本身和 PowerShell profile 里的初始化代码
+- **Oh My Posh**：程序本身和 PowerShell profile 里的初始化代码（包括其中的 UTF-8 控制台编码设置）
 - **Azure CLI**
 - **强制深色主题**
 - **勿扰模式**
+- **Edge 新标签页设为空白页**：这条策略只在加入域或 MDM 管理的电脑上生效，个人电脑上会被 Edge 忽略
 
-相应地，卸载时也不再删除 WSL 和 Ubuntu、不再重置主题和勿扰设置、不再卸载上面这些软件。
+相应地，卸载时也不再清理上面这些内容。
 
 **标准版和完整版的划分不同**：官方标准版也会安装 .NET SDK 10 和 PowerToys，但不包含 Sudo、开发者模式、Edge 设置，以及隐藏蓝牙图标、关闭网页搜索 / 搜索亮点 / 小组件、快速访问不显示推荐文件这几项。
 
@@ -87,10 +86,11 @@ git merge upstream/main
 | --- | --- |
 | `setup-standard.ps1`、`setup-full.ps1`、`uninstall.ps1` | 下载地址换成本仓库、ref 改为 `main`、去掉签名校验、加上 `-AllowUnsigned` |
 | `bootstrap.ps1` | 仓库地址换成本仓库；`-AllowUnsigned` 时也传 `-ExecutionPolicy RemoteSigned`，否则在执行策略为 Restricted 的新机器上无法运行 |
-| `steps/_elevation.ps1` | 提权和重新启动时同样传执行策略 |
+| `steps/_elevation.ps1` | 脚本重新启动自身时同样传执行策略 |
 | `workloads/devconfig.ps1` | 去掉 Copilot、Oh My Posh、Azure CLI 和 WSL；调整标准版包含的软件和阶段 |
 | `steps/terminal.ps1` | 去掉强制深色主题 |
 | `steps/registry-taskbar-search.ps1` | 去掉勿扰模式；调整标准版包含的设置 |
+| `steps/edge.ps1` | 去掉新标签页策略 |
 | `steps/registry-system.ps1`、`steps/registry-explorer.ps1` | 调整标准版包含的设置 |
 
 ---
