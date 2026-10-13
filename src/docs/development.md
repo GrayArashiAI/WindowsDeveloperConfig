@@ -69,11 +69,11 @@ Command Palette extension.
 | Flow              | CI status     | Installs                                                                                |
 | ----------------- | ------------- | --------------------------------------------------------------------------------------- |
 | TypeScript        | ✅ automated   | `OpenJS.NodeJS.LTS` + `npm install -g typescript`                                       |
-| PHP               | ✅ automated   | `PHP.PHP.8.5`                                                                           |
+| PHP               | 🙋 manual     | PowerShell-native one-liner: PowerShell 7, `PHP.PHP.8.5` ([`workloads/php.ps1`](../windows-dev-config/workloads/php.ps1)) |
 | .NET              | ✅ automated   | `Microsoft.DotNet.SDK.10`                                                               |
 | Go                | ✅ automated   | `GoLang.Go` (rolling — winget publishes Go unversioned)                                 |
 | Java              | ✅ automated   | `Microsoft.OpenJDK.25`                                                                  |
-| Rust              | ✅ automated   | `Rustlang.Rustup` (then `rustup default stable`)                                        |
+| Rust              | 🙋 manual     | PowerShell-native one-liner: Developer Mode, PowerShell 7, `Rustlang.Rustup`, Visual Studio Community 2026 with the Desktop development with C++ workload, and the stable Rust toolchain ([`workloads/rust.ps1`](../windows-dev-config/workloads/rust.ps1)) |
 | Python            | ✅ automated   | `Python.Python.3.14`, `astral-sh.uv`                                                    |
 | SQL Developer     | 🙋 manual     | Lightweight SQL Developer: SQL Server + sqlcmd + VS Code extension; no VS/SSDT           |
 | PowerShell        | ✅ automated   | `Microsoft.PowerShell`, `Microsoft.VisualStudioCode`, VS Code PowerShell/Pester extensions + PSScriptAnalyzer settings |
@@ -112,12 +112,12 @@ for build + configuration details.
 Workloads/
   _common/         # shared DSC glue plus direct AI acquisition, resolver catalog, and reporting helpers
   typescript/      # configuration.winget (core) + install.ps1 (thin shim)
-  php/             # configuration.winget (core) + install.ps1 (thin shim)
+  php/             # setup.ps1 (one-line setup via the engine)
   python/          # configuration.winget (core) + install.ps1 (thin shim)
-  dotnet/          # configuration.winget (core) + install.ps1 (thin shim)
-  go/              # configuration.winget (core) + install.ps1 (thin shim)
+  go/              # setup.ps1 (one-line setup via the engine)
+  dotnet/          # setup.ps1 (one-line setup via the engine)
   java/            # configuration.winget (core) + install.ps1 (thin shim)
-  rust/            # configuration.winget (core) + install.ps1 (thin shim)
+  rust/            # setup.ps1 (one-line setup via the engine)
   winforms/        # configuration.winget (core) + install.ps1 (thin shim)
   winui/           # setup.ps1 (one-line setup via the engine)
   cuda/            # x64/ARM64 CUDA + MSVC + compiled GPU-kernel readiness
@@ -168,6 +168,7 @@ This repo carries **two parallel copies** of every flow:
 | `src/future/cmdpal/`          | Command Palette extension. C# project. Reads `src/manifest.yml`.  | **Yes**  | n/a      |
 | `src/docs/development.md`     | Contributor docs (CI, validation, how to add a language).         | **Yes**  | n/a      |
 | `src/docs/windows-dev-config.md` | Windows Dev Config internals: file layout, phases, releases, workloads. | **Yes**  | n/a      |
+| `src/docs/ai-workloads.md`    | AI workload internals: backend selection, acquisition channels, partner validation. | **Yes**  | n/a      |
 | `src/tests/`                  | Hello-world programs + expected stdout used by the CI harness.    | **Yes**  | CI only  |
 
 **End users**: follow the [top-level README](../../README.md). Windows Dev Config's `bootstrap.ps1` verifies Microsoft signatures and installs to `%ProgramData%\CalmOS` with Administrator/SYSTEM-only write access. It requests process-scoped `RemoteSigned` without adding trusted publishers. Organization-enforced `AllSigned` may still prompt. For development, `-AllowUnsigned` uses `src/windows-dev-config/` without signature checks.
@@ -276,7 +277,6 @@ These don't touch your machine state and are a good pre-commit pass:
 ```bash
 # DSC YAML parses and has the expected shape.
 python3 -c "import yaml; yaml.safe_load(open('Workloads/typescript/configuration.winget'))"
-python3 -c "import yaml; yaml.safe_load(open('Workloads/php/configuration.winget'))"
 
 # manifest.yml parses (this is what CI's `discover` job consumes).
 python3 -c "import yaml; print(yaml.safe_load(open('manifest.yml')))"
@@ -610,9 +610,10 @@ if ((git rev-parse HEAD).Trim() -ne $ExpectedHead) {
 ```
 
 Then open elevated PowerShell in the repository root. Inventory the host and
-use the plan/apply harness from the README's **Partner validation commands**
-section. Each assigned flow must first write `<name>-plan.json`, stop on any
-blocker, then write `<name>-final.json` and satisfy `result.ready=true`.
+use the plan/apply harness from **Partner validation** in
+[`ai-workloads.md`](./ai-workloads.md#partner-validation). Each assigned flow
+must first write `<name>-plan.json`, stop on any blocker, then write
+`<name>-report.json` and satisfy `result.ready=true`.
 
 Because PR testing runs the unsigned source under `src/`, first use the
 repository's unsigned-development procedure: record the test user's current
