@@ -31,7 +31,7 @@ irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/s
 | --- | --- | --- |
 | 软件 | Windows Terminal、Intelligent Terminal、PowerShell 7、Git、GitHub CLI、VS Code、Python 3.14 + uv、VC++ 运行库、Node.js LTS + nvm、Coreutils、Windows App CLI | PowerToys |
 | 系统 | Sudo、开发者模式、长路径支持 | 开启远程桌面 |
-| 资源管理器 | 显示文件扩展名和隐藏文件、标题栏显示完整路径、默认打开"此电脑"、快速访问不显示常用文件夹和推荐、不显示 OneDrive 的提示、显示详细信息窗格 | — |
+| 资源管理器 | 显示文件扩展名和隐藏文件、标题栏显示完整路径、默认打开"此电脑"、快速访问不显示推荐内容、不显示 OneDrive 的提示、显示详细信息窗格 | — |
 | 任务栏、开始菜单、搜索 | 任务栏右键"结束任务"、隐藏蓝牙图标、关闭开始菜单推荐和账户通知、关闭网页搜索和搜索亮点、关闭小组件 | — |
 | Edge | 跳过首次运行向导 | — |
 | 终端 | 默认配置设为 PowerShell 7 | — |
