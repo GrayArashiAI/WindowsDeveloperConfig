@@ -4,7 +4,8 @@
 
 ## 一键安装
 
-打开任意 PowerShell 窗口运行下面的命令。过程中会弹出一次 UAC 提权，不需要重启。
+> [!WARNING]
+> 官方 README 里的 `aka.ms/devconfig/...` 链接指向微软原版，不包含本仓库的改动。
 
 **标准版**：常用开发工具 + 系统设置
 
@@ -12,7 +13,7 @@
 irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/src/windows-dev-config/setup-standard.ps1 | iex
 ```
 
-**完整版**：标准版 + .NET SDK 10、PowerToys、WinUI 模板、远程桌面
+**完整版**：标准版 + PowerToys、远程桌面
 
 ```powershell
 irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/src/windows-dev-config/setup-full.ps1 | iex
@@ -24,75 +25,29 @@ irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/s
 irm https://raw.githubusercontent.com/GrayArashiAI/WindowsDeveloperConfig/main/src/windows-dev-config/uninstall.ps1 | iex
 ```
 
-运行前请注意：
-
-- 可以重复运行，已经完成的步骤会自动跳过；中途出错的话，再运行一次即可。
-- 部分资源管理器和任务栏设置，要注销后重新登录才会生效。
-- 安装文件和日志保存在 `%ProgramData%\CalmOS`。
-- 卸载会删除下表中的所有软件（Windows Terminal 和 VC++ 运行库除外），**安装前就已存在的也会被删除**；设置会恢复为 Windows 默认值，而不是安装前的值。
-- 官方 README 里的 `aka.ms/devconfig/...` 链接运行的是微软原版，不包含本仓库的改动。
-
 ## 安装内容
 
 | 类别 | 标准版 | 完整版额外包含 |
 | --- | --- | --- |
-| 软件 | Windows Terminal、Intelligent Terminal、PowerShell 7、Git、GitHub CLI、VS Code、Python 3.14 + uv、VC++ 运行库、Node.js LTS + nvm、Coreutils、Windows App CLI | .NET SDK 10、PowerToys、WinUI `dotnet new` 模板 |
-| 系统 | Sudo（内联模式）、开发者模式、长路径支持 | 开启远程桌面（不开放防火墙） |
-| 资源管理器 | 显示文件扩展名和隐藏文件、标题栏显示完整路径、默认打开"此电脑"、快速访问不显示最近使用的文件 / 常用文件夹 / 推荐文件、不显示同步提供程序（如 OneDrive）的提示、显示详细信息窗格 | — |
+| 软件 | Windows Terminal、Intelligent Terminal、PowerShell 7、Git、GitHub CLI、VS Code、Python 3.14 + uv、VC++ 运行库、Node.js LTS + nvm、Coreutils、Windows App CLI | PowerToys |
+| 系统 | Sudo、开发者模式、长路径支持 | 开启远程桌面 |
+| 资源管理器 | 显示文件扩展名和隐藏文件、标题栏显示完整路径、默认打开"此电脑"、快速访问不显示常用文件夹和推荐、不显示 OneDrive 的提示、显示详细信息窗格 | — |
 | 任务栏、开始菜单、搜索 | 任务栏右键"结束任务"、隐藏蓝牙图标、关闭开始菜单推荐和账户通知、关闭网页搜索和搜索亮点、关闭小组件 | — |
 | Edge | 跳过首次运行向导 | — |
 | 终端 | 默认配置设为 PowerShell 7 | — |
 
-## 与官方原版的区别
-
-**两个版本都去掉了**
+## 从原版中移除的内容
 
 - **Copilot**：GitHub Copilot CLI、Windows Terminal 里的 Copilot 配置、win-dev-skills 插件市场和 WinUI Copilot 插件
 - **WSL**：WSL 平台和 Ubuntu，安装过程因此不再需要重启
-- **Oh My Posh**：程序本身和 PowerShell profile 里的初始化代码（包括其中的 UTF-8 控制台编码设置）
-- **Cascadia Nerd Font**：终端默认字体本来就是 Cascadia Mono，NF 版只多了图标字形，不装 Oh My Posh 用不上
+- **Oh My Posh**：程序本身、PowerShell profile 里的初始化代码，以及 Nerd Font 字体
+- **.NET SDK 10**
 - **Azure CLI**
 - **强制深色主题**
 - **勿扰模式**
 - **Edge 新标签页设为空白页**：这条策略只在加入域或 MDM 管理的电脑上生效，个人电脑上会被 Edge 忽略
 
 相应地，卸载时也不再清理上面这些内容。
-
-**标准版和完整版的划分不同**：官方标准版也会安装 .NET SDK 10 和 PowerToys，但不包含 Sudo、开发者模式、Edge 设置，以及隐藏蓝牙图标、关闭网页搜索 / 搜索亮点 / 小组件、快速访问不显示推荐文件这几项。
-
-**运行方式**：一键命令运行的是本仓库 `main` 分支上 `src/windows-dev-config/` 里**未签名**的源码，不做微软签名校验；官方运行的是固定到某个 commit、经过微软签名的根目录副本。这意味着，能推送到本仓库 `main` 分支的人，就能控制以管理员权限运行的代码。
-
-## 同步上游
-
-首次同步前添加上游仓库：
-
-```bash
-git remote add upstream https://github.com/microsoft/WindowsDeveloperConfig
-```
-
-之后每次同步：
-
-```bash
-git fetch upstream
-git merge upstream/main
-```
-
-- GitHub 网页上的 "Sync fork" 无法处理冲突，要用命令行合并。
-- 三个入口脚本里的 `$payloadRef` 官方每次发版都会改，merge 时必然冲突，保留本仓库的版本即可。
-- 如果上游改了 `.github/workflows/` 下的文件，推送前需要给 GitHub CLI 补上 `workflow` 权限：`gh auth refresh -h github.com -s workflow`。
-
-本仓库改过的文件如下（另外还有本 README 开头这部分），冲突只会出现在这些文件里：
-
-| 文件（位于 `src/windows-dev-config/`） | 改动 |
-| --- | --- |
-| `setup-standard.ps1`、`setup-full.ps1`、`uninstall.ps1` | 下载地址换成本仓库、ref 改为 `main`、去掉签名校验、加上 `-AllowUnsigned` |
-| `bootstrap.ps1` | 仓库地址换成本仓库；`-AllowUnsigned` 时也传 `-ExecutionPolicy RemoteSigned`，否则在执行策略为 Restricted 的新机器上无法运行 |
-| `steps/_elevation.ps1` | 脚本重新启动自身时同样传执行策略 |
-| `workloads/devconfig.ps1` | 去掉 Copilot、Oh My Posh、Azure CLI、WSL 和字体；调整标准版包含的软件和阶段 |
-| `steps/terminal.ps1` | 去掉强制深色主题 |
-| `steps/registry-taskbar-search.ps1` | 去掉勿扰模式；调整标准版包含的设置 |
-| `steps/edge.ps1` | 去掉新标签页策略 |
-| `steps/registry-system.ps1`、`steps/registry-explorer.ps1` | 调整标准版包含的设置 |
 
 ---
 

@@ -36,7 +36,6 @@ $phases = @(
                 'Git'
                 'GitHubCLI'
                 'VSCode'
-                'DotnetSdk'
                 'Python'
                 'VCRedist'
                 'UV'
@@ -78,21 +77,11 @@ $phases = @(
         Title     = 'Windows Terminal'
         Uninstall = $true
     }
-    @{
-        # Only the WinUI templates step; the Copilot profile and plugin steps are skipped.
-        File      = 'copilot.ps1'
-        Function  = 'Invoke-CopilotPhase'
-        Title     = 'WinUI templates'
-        Uninstall = $true
-        Steps     = if ($Action -eq 'Uninstall') { @('WinUITemplatesCleanup') } else { @('WinUITemplates') }
-    }
 )
 if ($Action -eq 'Partial') {
-    # Partial setup has no WinUI templates step, so the copilot.ps1 phase has nothing left to run.
-    $phases = @($phases | Where-Object { $_.File -ne 'copilot.ps1' })
-    # The lite setup skips the two largest downloads.
+    # The standard setup skips PowerToys, a large download.
     $packages = ($phases | Where-Object { $_.File -eq 'packages.ps1' }).Parameters
-    $packages.Packages = @($packages.Packages | Where-Object { $_ -notin @('DotnetSdk', 'PowerToys') })
+    $packages.Packages = @($packages.Packages | Where-Object { $_ -ne 'PowerToys' })
 } elseif ($Action -eq 'Uninstall') {
     $phases = @($phases | Where-Object { $_['Uninstall'] })
     # Reset Terminal after removing the tools and WSL fragments that can recreate profiles.
